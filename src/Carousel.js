@@ -13,8 +13,11 @@ class Carousel extends Component {
     super(props);
     this.lastX = 0;
     this.startX = 0;
-    this.x = 0;
+    this.x = 0; // translate x 
     this.index = 1;
+    this.frameWitdh = undefined;
+    this.frameLength = undefined;
+    this.contentWidth = undefined;
   }
 
   componentDidMount() {
@@ -25,7 +28,7 @@ class Carousel extends Component {
     this.initFrames(el);
     this.getEleWidth(el);
     this.bindEvents(el);
-    this.scrollToByIndex(1, 0);
+    this.scrollToByIndex(this.index, 0);
   }
   getEleWidth(el) {
     this.frameWitdh = el.getBoundingClientRect().width;
@@ -47,7 +50,6 @@ class Carousel extends Component {
   };
   initFrames(el) {
     const frames = el.childNodes;
-    console.log(frames);
     const firstFrame = frames[0].cloneNode(true);
     const lastFrame = frames[frames.length - 1].cloneNode(true);
     el.insertBefore(lastFrame, frames[0]);
@@ -55,34 +57,29 @@ class Carousel extends Component {
   }
 
   onStart = e => {
-    console.log(this.index);
     e.preventDefault();
     this.startX = e.touches[0].clientX;
-    this.lastX = this.x;
+    this.lastX = this.x; // translate x 
   };
   onMove = e => {
     e.preventDefault();
     this.deltaX = e.touches[0].clientX - this.startX;
-    console.log(this.index);
     if (this.deltaX > 0 && this.index === 1) {
-      this.scrollToByIndex(6, 0);
-      this.index = 6;
-      this.lastX = - this.frameWitdh *6;;
+      const lastIndex = this.frameLength - 1;
+      this.scrollToByIndex(lastIndex, 0);
+      this.lastX = -this.frameWitdh * lastIndex;
     } else if (this.deltaX < 0 && this.index === 5) {
       this.scrollToByIndex(0, 0);
       this.lastX = 0;
-      this.index = 1;
     }
-    this.x = this.deltaX + this.lastX;
+    this.x = this.deltaX + this.lastX; // translate x 
 
-    this.setTransform(this.contentRef, `translate3d(${this.x}px, 0, 0)`);
+    this.setTransform(this.contentRef, `translate3d(${this.x}px, 0, 0)`); // translate x 
     this.setTransition(this.contentRef, `transform 0 ease`);
   };
   onFinish = e => {
-    this.index = this.calcIndex(this.x);
+    this.index = this.calcIndex(this.x); // translate x 
     this.scrollToByIndex(this.index, 0.3);
-    console.log(this.index, 'end');
-
   };
   onEnd = () => {
     this.setTransition(this.contentRef, '');
@@ -105,8 +102,8 @@ class Carousel extends Component {
   }
 
   scrollTo(x, y, time) {
-    if (this.x !== x) {
-      this.x = x;
+    if (this.x !== x) { // translate x 
+      this.x = x; // translate x 
       this.setTransform(this.contentRef, `translate3d(${x}px, 0, 0)`);
       this.setTransition(this.contentRef, `transform ${time}s ease`);
     }
