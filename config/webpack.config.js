@@ -11,6 +11,7 @@ module.exports = {
     path: path.join(__dirname, "../examples/dist"),
     filename: "bundle.js"
   },
+  devtool: 'cheap-module-eval-source-map',
   module: {
     rules: [
       {

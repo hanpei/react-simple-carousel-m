@@ -1,0 +1,22 @@
+.container {
+  width: 100%;
+  background: #ddd;
+  position: relative;
+  overflow: hidden;
+}
+
+.content {
+  position: absolute;
+  display: flex;
+  width: 100%;
+  flex-direction: row;
+  flex-wrap: nowrap;
+}
+
+.item {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  flex: 0 0 auto;
+  width: 100%;
+}
