@@ -14,7 +14,7 @@ class Carousel extends Component {
     super(props);
     this.lastX = 0;
     this.startX = 0;
-    this.x = 0;
+    this.x = 0; // translate x
     this.index = 1;
     this.frameWitdh = undefined;
     this.frameLength = undefined;
@@ -61,67 +61,52 @@ class Carousel extends Component {
   onStart = e => {
     e.preventDefault();
     this.startX = e.touches[0].clientX;
-    this.lastX = this.x;
+    this.lastX = this.x; // translate x
   };
   onMove = e => {
     e.preventDefault();
     this.deltaX = e.touches[0].clientX - this.startX;
-    this.x = this.deltaX + this.lastX;
+    if (this.deltaX > 0 && this.index === 1) {
+      const lastIndex = this.frameLength - 1;
+      this.scrollToByIndex(lastIndex, 0);
+      this.lastX = -this.frameWitdh * lastIndex;
+    } else if (this.deltaX < 0 && this.index === 5) {
+      this.scrollToByIndex(0, 0);
+      this.lastX = 0;
+    }
+    this.x = this.deltaX + this.lastX; // translate x
 
-    this.setTransform(this.contentRef, `translate3d(${this.x}px, 0, 0)`);
+    this.setTransform(this.contentRef, `translate3d(${this.x}px, 0, 0)`); // translate x
     this.setTransition(this.contentRef, `transform 0 ease`);
   };
   onFinish = e => {
-    console.log(this.deltaX);
-    const direction = this.getDirection(this.deltaX);
-    console.log(direction);
-    this.scrollToByIndex(this.index, 0.3, direction);
+    this.index = this.calcIndex(this.x); // translate x
+    this.scrollToByIndex(this.index, 0.3);
   };
   onEnd = () => {
     this.setTransition(this.contentRef, '');
   };
 
-  getDirection(deltaX) {
-    // 1: next,  -1: previous, 0: no move
-    if (deltaX > 50) {
-      return -1;
-    } else if (deltaX < -50) {
-      return 1;
-    } else {
-      return 0;
+  calcIndex(x) {
+    let index = Math.abs(Math.round(x / this.frameWitdh));
+    if (this.deltaX < -50) {
+      index += 1;
+    } else if (this.deltaX > 50) {
+      index -= 1;
     }
+    return index;
   }
 
-  scrollToByIndex(index, time, direction) {
+  scrollToByIndex(index, time) {
     let i = index;
-    if (direction === 1) {
-      if (i >= this.frameLength - 2) {
-        // this.scrollTo(this.deltaX, 0, 0);
-        this.setTransform(this.contentRef, `translate3d(${this.deltaX}px, 0, 0)`);
-        // console.log(this.x);
-        setTimeout(() => {
-          this.scrollTo(- this.frameWitdh, 0, 0.3);
-        }, 10);
-        return
-      } else {
-        i++;
-      }
-    } else if (direction === -1) {
-      if (i <= 1) {
-        i = this.frameLength - 1;
-        this.scroll(-i * this.frameWitdh, 0, 0);
-      } else {
-        i--;
-      }
-    }
     const targetX = -i * this.frameWitdh;
-    this.index = i;
     this.scrollTo(targetX, 0, time);
   }
 
   scrollTo(x, y, time) {
     if (this.x !== x) {
-      this.x = x;
+      // translate x
+      this.x = x; // translate x
       this.setTransform(this.contentRef, `translate3d(${x}px, 0, 0)`);
       this.setTransition(this.contentRef, `transform ${time}s ease`);
     }
